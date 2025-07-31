@@ -1,4 +1,4 @@
-package com.example.local_expenses.data.local.entity
+package com.local_expenses.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -6,7 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "category",
+    tableName = "account",
     foreignKeys = [ForeignKey(
         entity = UserEntity::class,
         parentColumns = ["userId"],
@@ -15,10 +15,10 @@ import androidx.room.PrimaryKey
     )],
     indices = [Index("userId")]
 )
-data class CategoryEntity(
-    @PrimaryKey(autoGenerate = true) val categoryId: Int = 0,
-    val name: String,
-    val icon: String,
+data class AccountEntity(
+    @PrimaryKey(autoGenerate = true) val accountId: Int = 0,
+    val accountName: String,
+    val balance: Double,
     val userId: Int,
     val createdAt: Long,
     val updatedAt: Long,

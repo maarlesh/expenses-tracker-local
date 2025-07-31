@@ -2,14 +2,16 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
-    namespace = "com.example.local_expenses"
+    namespace = "com.local_expenses"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.local_expenses"
+        applicationId = "com.local_expenses"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -58,4 +60,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     val room_version = "2.7.2"
     implementation("androidx.room:room-runtime:$room_version")
+    ksp("androidx.room:room-compiler:2.5.0")
+    implementation("com.google.dagger:hilt-android:2.56.2")
+    ksp("com.google.dagger:hilt-android-compiler:2.56.2")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 }

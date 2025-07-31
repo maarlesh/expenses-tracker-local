@@ -1,4 +1,4 @@
-package com.example.local_expenses.ui.theme
+package com.local_expenses.presentation.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

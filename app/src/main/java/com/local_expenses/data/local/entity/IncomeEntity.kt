@@ -1,4 +1,4 @@
-package com.example.local_expenses.data.local.entity
+package com.local_expenses.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
