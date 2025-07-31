@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -19,6 +21,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.local_expenses.data.local.entity.UserEntity
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.icons.filled.PersonPin
+
 
 @Composable
 fun ProfileSelectionScreen(
@@ -34,19 +40,18 @@ fun ProfileSelectionScreen(
             .background(
                 brush = Brush.linearGradient(
                     colors = listOf(
-                        Color(0xFF00F2FE), // electric cyan
-                        Color(0xFF4A00E0), // electric blue
-                        Color(0xFFBC6FF1)  // radiant purple
+                        Color(0xFF26003D), // vibrant pink
+                        Color(0xFF7303c0), // vibrant pink
+                        Color(0xFFec38bc),  // vivid yellow
                     ),
                     start = Offset(0f, 0f),
-                    end = Offset(1000f, 2000f)
+                    end = Offset(1000f, 0f)
                 )
             )
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .background(Color.White.copy(alpha = 0.18f), RoundedCornerShape(32.dp))
                 .border(
@@ -62,19 +67,23 @@ fun ProfileSelectionScreen(
                 .padding(horizontal = 28.dp, vertical = 26.dp)
         ) {
             Text(
-                text = "I'm signing up as",
+                text = "I am signing up as",
                 style = MaterialTheme.typography.titleLarge,
-                color = Color(0xFF2E233D),
+                color = Color(0xFFFFFFFF),
                 lineHeight = 34.sp
             )
 
             Spacer(Modifier.height(24.dp))
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(18.dp),
-                modifier = Modifier.fillMaxWidth()
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 140.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                modifier = Modifier
+                    .heightIn(max = 300.dp)
+                    .fillMaxWidth()
             ) {
-                users.take(2).forEachIndexed { index, user ->
+                itemsIndexed(users) { index, user ->
                     SelectionProfileCard(
                         name = user.name,
                         isSelected = selectedIndex == index,
@@ -82,6 +91,7 @@ fun ProfileSelectionScreen(
                     )
                 }
             }
+
 
             Spacer(Modifier.height(32.dp))
 
@@ -102,7 +112,7 @@ fun SelectionProfileCard(
     onClick: () -> Unit
 ) {
     val backgroundColor =
-        if (isSelected) Color.White.copy(alpha = 0.58f) else Color.White.copy(alpha = 0.22f)
+        if (isSelected) Color.White.copy(alpha = 0.44f) else Color.White.copy(alpha = 0.22f)
     val borderColor =
         if (isSelected) Color(0xFFFF2E63) else Color.White.copy(alpha = 0.45f)
     val textColor =
@@ -118,14 +128,14 @@ fun SelectionProfileCard(
             .border(
                 width = 2.dp,
                 color = borderColor,
-                shape = RoundedCornerShape(24.dp)
+                shape = RoundedCornerShape(18.dp)
             )
             .padding(vertical = 24.dp)
             .alpha(alpha),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
-            imageVector = Icons.Filled.Person,
+            imageVector = Icons.Filled.PersonPin,
             contentDescription = "profile",
             tint = iconTint,
             modifier = Modifier.size(54.dp)
