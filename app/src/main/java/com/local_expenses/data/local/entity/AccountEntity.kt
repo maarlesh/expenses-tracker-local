@@ -20,6 +20,6 @@ data class AccountEntity(
     val accountName: String,
     val balance: Double,
     val userId: Int,
-    val createdAt: Long,
-    val updatedAt: Long,
+    val createdAt: Long = System.currentTimeMillis(),
+    val updatedAt: Long = System.currentTimeMillis(),
 )
