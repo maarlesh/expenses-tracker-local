@@ -67,7 +67,7 @@ class MainActivity : ComponentActivity() {
 
                             val accounts by viewModel.account.collectAsState()
 
-                            HomeScreen(accounts = accounts)
+                            HomeScreen(viewModel = hiltViewModel(), accounts = accounts, userId)
                         }
 
                         composable(

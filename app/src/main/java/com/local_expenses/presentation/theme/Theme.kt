@@ -5,9 +5,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.geometry.Offset
+import androidx.core.view.WindowCompat
+import androidx.compose.ui.platform.LocalView
+import android.app.Activity
+
 
 val AppGradientBrush = Brush.linearGradient(
     colors = listOf(
@@ -63,6 +68,13 @@ fun LocalexpensesTheme(
     val colorScheme = when {
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
+    }
+
+    val view = LocalView.current
+    val darkIcons = false
+    SideEffect {
+        val window = (view.context as Activity).window
+        WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkIcons
     }
 
     MaterialTheme(

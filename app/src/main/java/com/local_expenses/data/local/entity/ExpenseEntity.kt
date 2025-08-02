@@ -19,5 +19,5 @@ data class ExpenseEntity(
     val description: String,
     val amount: Double,
     val accountId: Int,
-    val createdAt: Long
-)
+    val createdAt: Long = System.currentTimeMillis(),
+    val updatedAt: Long = System.currentTimeMillis(),)

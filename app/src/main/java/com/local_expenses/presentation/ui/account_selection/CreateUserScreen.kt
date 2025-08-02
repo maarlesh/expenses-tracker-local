@@ -51,9 +51,7 @@ fun CreateUserScreen(
 
     LaunchedEffect(createdUserIdFlow) {
         createdUserIdFlow.collect { userId ->
-            // Navigate once user is created
             navController.navigate("home/$userId") {
-                // Optional: clear backstack so user can't go back to create screen
                 popUpTo("profile_selection") { inclusive = true }
             }
         }

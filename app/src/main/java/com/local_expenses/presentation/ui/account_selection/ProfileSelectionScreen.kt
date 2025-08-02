@@ -22,7 +22,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.ui.draw.shadow
-import androidx.navigation.compose.rememberNavController
 import com.local_expenses.presentation.theme.AppGradientBrush2
 import com.local_expenses.presentation.ui.common.AppButton
 
@@ -36,6 +35,7 @@ fun ProfileSelectionScreen(
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
     Box(
         modifier = Modifier
+//            .systemBarsPadding()
             .fillMaxSize()
             .background(AppGradientBrush2)
             .padding(horizontal = 16.dp),
