@@ -7,7 +7,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.local_expenses.data.local.entity.UserEntity
 import com.local_expenses.presentation.theme.LocalexpensesTheme
+import com.local_expenses.presentation.ui.account_selection.CreateUserScreen
 import com.local_expenses.presentation.ui.account_selection.ProfileSelectionScreen
 import com.local_expenses.presentation.ui.account_selection.ProfileSelectionViewModel
 import com.local_expenses.presentation.ui.home_screen.HomeScreen
@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
                                 onProfileSelected = { selectedUser ->
                                     Log.d("SelectedProfile", "Selected user: ${selectedUser.name}")
                                     navController.navigate("home/${selectedUser.userId}")
-                                }
+                                },
                             )
                         }
 
@@ -69,6 +69,15 @@ class MainActivity : ComponentActivity() {
 
                             HomeScreen(accounts = accounts)
                         }
+
+                        composable(
+                            route = "create_user",
+                        ){
+                            CreateUserScreen(
+                                viewModel = hiltViewModel(),
+                                navController = navController,
+                            )
+                        }
                     }
                 }
             }
@@ -80,7 +89,7 @@ class MainActivity : ComponentActivity() {
 fun ProfileSelectionRoute(
     viewModel: ProfileSelectionViewModel = hiltViewModel(),
     navController: NavController,
-    onProfileSelected: (UserEntity) -> Unit
+    onProfileSelected: (UserEntity) -> Unit,
 ) {
     val users by viewModel.accounts.collectAsState(emptyList())
 
@@ -90,6 +99,9 @@ fun ProfileSelectionRoute(
             Log.d("SelectedProfile", "Selected user: ${selectedUser.name}")
             viewModel.setSelectedUserId(selectedUser.userId)
             navController.navigate("home/${selectedUser.userId}")
+        },
+        onCreateUserSelected = {
+            navController.navigate("create_user")
         }
     )
 }

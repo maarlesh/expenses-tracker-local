@@ -18,6 +18,9 @@ class ProfileSelectionViewModel @Inject constructor(
     private val accountDao: AccountDao
 ) : ViewModel() {
 
+    private val _createdUserId = MutableSharedFlow<Long>(replay = 0)  // Event stream
+    val createdUserId = _createdUserId.asSharedFlow()
+
 //    init {
 //        viewModelScope.launch{
 //            val userId1 = userDao.insertUser(UserEntity(name = "maarlesh", password = "maarlesh"))
@@ -64,5 +67,13 @@ class ProfileSelectionViewModel @Inject constructor(
 
     fun setSelectedUserId(userId: Int) {
         _currentUserId.value = userId
+    }
+
+    fun createUser(username: String, password: String) {
+        viewModelScope.launch {
+            val userEntity = UserEntity(name = username, password = password)
+            val id = userDao.insertUser(userEntity)
+            _createdUserId.emit(id)
+        }
     }
 }
