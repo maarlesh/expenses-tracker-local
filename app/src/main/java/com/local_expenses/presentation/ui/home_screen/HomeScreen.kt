@@ -7,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -36,6 +35,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,11 +49,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import com.local_expenses.presentation.theme.AppGradientBrush2
 import com.local_expenses.presentation.theme.MontserratFontFamily
 import com.local_expenses.presentation.ui.common.BottomNavBar
 import kotlinx.coroutines.launch
+import androidx.compose.material3.TextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -357,14 +357,14 @@ fun AddAccountSheetContent(
 
     Column(
         Modifier
-            .background(Color.White.copy(alpha = 0.25f), RoundedCornerShape(28.dp))
+            .background(Color.White, RoundedCornerShape(28.dp))
             .fillMaxWidth()
             .padding(start = 24.dp, end = 24.dp, bottom = 24.dp, top = 24.dp)
     ) {
         Text(
             text = "Add New Account",
             style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.primary
+            color = Color.Black
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -372,16 +372,20 @@ fun AddAccountSheetContent(
         OutlinedTextField(
             value = accountName,
             onValueChange = { accountName = it },
-            label = { Text("Account Name", color = Color.White, fontFamily = MontserratFontFamily) },
+            label = { Text("Account Name", color = Color.Black, fontFamily = MontserratFontFamily) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Text),
             textStyle =TextStyle(
-                color = MaterialTheme.colorScheme.primary,
+                color = Color.Black,
                 fontFamily = MontserratFontFamily,
                 fontWeight = FontWeight.Normal,
                 fontSize = 16.sp
             ),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color(0xFFFF69B4),
+                unfocusedBorderColor = Color.Gray,
+            )
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -389,16 +393,20 @@ fun AddAccountSheetContent(
         OutlinedTextField(
             value = balanceInput,
             onValueChange = { balanceInput = it },
-            label = { Text("Initial Balance", color = Color.White, fontFamily = MontserratFontFamily) },
+            label = { Text("Initial Balance", color = Color.Black, fontFamily = MontserratFontFamily) },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
             singleLine = true,
             textStyle =TextStyle(
-                color = MaterialTheme.colorScheme.primary,
+                color = Color.Black,
                 fontFamily = MontserratFontFamily,
                 fontWeight = FontWeight.Normal,
                 fontSize = 16.sp
             ),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color(0xFFFF69B4),
+                unfocusedBorderColor = Color.Gray,
+            )
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -413,19 +421,20 @@ fun AddAccountSheetContent(
                     accountName = ""
                     balanceInput = ""
                 }),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Cancel", style = MaterialTheme.typography.bodyLarge)
+                Text("Cancel", style = MaterialTheme.typography.bodyLarge, color = Color.Black)
             }
             Button(
                 onClick = {
                     onAddAccount(accountName.trim(), balanceInput.toDouble())
                 },
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
                 enabled = accountName.isNotBlank() && isValidBalance,
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Add", style = MaterialTheme.typography.bodyLarge, color = Color.Black)
+                Text("Add", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.primary)
             }
         }
     }
