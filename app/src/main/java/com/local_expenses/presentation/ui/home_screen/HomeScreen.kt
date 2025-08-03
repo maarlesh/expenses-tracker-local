@@ -1,5 +1,9 @@
 package com.local_expenses.presentation.ui.home_screen
+import android.R
+import android.os.Build
 import android.util.Log
+import android.widget.Space
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -28,10 +32,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -53,8 +60,10 @@ import com.local_expenses.presentation.theme.AppGradientBrush2
 import com.local_expenses.presentation.theme.MontserratFontFamily
 import com.local_expenses.presentation.ui.common.BottomNavBar
 import kotlinx.coroutines.launch
-import androidx.compose.material3.TextField
+import com.local_expenses.presentation.theme.PrimaryTextColor
+import java.time.YearMonth
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -65,6 +74,7 @@ fun HomeScreen(
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
+    var selectedDate by remember { mutableStateOf(YearMonth.of(2025, 8)) }
 
     if(showBottomSheet){
         ModalBottomSheet(onDismissRequest = {
@@ -91,7 +101,6 @@ fun HomeScreen(
 
     Box(
         modifier = Modifier
-//            .systemBarsPadding()
             .fillMaxSize()
             .background(AppGradientBrush2)
             .systemBarsPadding()
@@ -101,16 +110,43 @@ fun HomeScreen(
                 .padding(horizontal = 16.dp)
                 .fillMaxSize(),
         ) {
+            Text(
+                "Accounts",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
             AccountCarousel(accounts, onAddClicked = {
                 showBottomSheet = true
             })
+            Text(
+                "Transactions  ",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                MonthSwitcher(
+                    selectedDate = selectedDate,
+                    onMonthChange = { selectedDate = it }
+                )
+            }
+            Spacer(
+                modifier = Modifier.height(16.dp)
+            )
             LazyColumn (
-                modifier = Modifier.fillMaxSize().padding(
-                    start = 0.dp,
-                    end = 0.dp,
-                    top = 0.dp,
-                    bottom = 90.dp,
-                ),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        start = 0.dp,
+                        end = 0.dp,
+                        top = 0.dp,
+                        bottom = 90.dp,
+                    ),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ){
                 item {
@@ -320,7 +356,10 @@ fun AccountCarousel(
                         modifier = Modifier
                             .size(44.dp)
                             .shadow(10.dp, shape = CircleShape)
-                            .background(MaterialTheme.colorScheme.secondaryContainer, shape = CircleShape)
+                            .background(
+                                MaterialTheme.colorScheme.secondaryContainer,
+                                shape = CircleShape
+                            )
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
@@ -435,6 +474,60 @@ fun AddAccountSheetContent(
                 modifier = Modifier.weight(1f)
             ) {
                 Text("Add", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.primary)
+            }
+        }
+    }
+}
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun MonthSwitcher(
+    selectedDate: YearMonth,
+    onMonthChange: (YearMonth) -> Unit
+) {
+    val now = YearMonth.now()
+    Box(modifier = Modifier
+        .background(Color.White.copy(alpha = 0.25f), RoundedCornerShape(28.dp))
+        .border(
+            1.dp,
+            Brush.linearGradient(
+                listOf(Color.White.copy(alpha = 0.55f), Color.White.copy(alpha = 0.12f))
+            ),
+            RoundedCornerShape(28.dp)
+        )
+        )
+    {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            IconButton(
+                onClick = { onMonthChange(selectedDate.minusMonths(1)) }
+            ) {
+                Icon(
+                    Icons.Default.ChevronLeft,
+                    contentDescription = "Previous Month",
+                    tint = PrimaryTextColor
+                )
+            }
+            Text(
+                text = "${
+                    selectedDate.month.name.lowercase().replaceFirstChar { it.uppercase() }
+                } ${selectedDate.year}",
+                style = MaterialTheme.typography.titleSmall,
+                color = PrimaryTextColor,
+                modifier = Modifier.padding(horizontal = 12.dp)
+            )
+            IconButton(
+                onClick = { onMonthChange(selectedDate.plusMonths(1)) },
+                enabled = selectedDate < now
+            ) {
+                Icon(
+                    Icons.Default.ChevronRight,
+                    contentDescription = "Next Month",
+                    tint = PrimaryTextColor
+                )
             }
         }
     }
