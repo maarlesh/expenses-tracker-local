@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -22,6 +21,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -162,47 +162,11 @@ fun IncomeContent(
             .padding(16.dp)
     ) {
         // Account Dropdown
-        Text(text = "Select Account", color = Color.White, style = MaterialTheme.typography.bodyMedium)
-        Box {
-            OutlinedTextField(
-                value = selectedAccount,
-                onValueChange = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { expandedAccount = true },
-                readOnly = true,
-//                colors = OutlinedTextFieldDefaults.colors(
-//                    focusedBorderColor = Color.Magenta,
-//                    unfocusedBorderColor = Color.White.copy(alpha = 0.4f),
-//                    containerColor = Color.White.copy(alpha = 0.1f),
-//                    textColor = Color.White,
-//                    cursorColor = Color.Magenta
-//                ),
-                singleLine = true,
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = null,
-                        tint = Color.White
-                    )
-                }
-            )
-            DropdownMenu(
-                expanded = expandedAccount,
-                onDismissRequest = { expandedAccount = false },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                accounts.forEach { account ->
-                    DropdownMenuItem(
-                        text = { Text(account) },
-                        onClick = {
-                            selectedAccount = account
-                            expandedAccount = false
-                        }
-                    )
-                }
-            }
-        }
+        AccountDropdown(
+            accounts = accounts,
+            selectedAccount = selectedAccount,
+            onAccountSelected = { selectedAccount = it }
+        )
 
         Spacer(Modifier.height(12.dp))
 
@@ -323,4 +287,54 @@ fun TransferContent(viewModel: CreationScreenViewModel) {
         modifier = Modifier.padding(16.dp),
         color = Color.White
     )
+}
+
+
+@Composable
+fun AccountDropdown(
+    accounts: List<String>,
+    selectedAccount: String,
+    onAccountSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box(
+
+    ) {
+        OutlinedTextField(
+            value = selectedAccount,
+            onValueChange = {},
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = true },
+            readOnly = true,
+            label = { Text("Select Account", color = Color.White) },
+            trailingIcon = {
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = "Dropdown",
+                        tint = Color.White
+                    )
+                }
+            },
+            singleLine = true,
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier =  Modifier.background(
+                AppGradientBrush2
+            )
+        ) {
+            accounts.forEach { account ->
+                DropdownMenuItem(
+                    text = { Text(account) },
+                    onClick = {
+                        onAccountSelected(account)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
 }
