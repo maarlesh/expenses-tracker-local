@@ -28,7 +28,9 @@ import androidx.compose.ui.zIndex
 @Composable
 fun BottomNavBar(
     selectedIndex: Int = 0,
-    onItemSelected: (Int) -> Unit = {}
+    onHomeClicked: () -> Unit = {},
+    onAddClicked: () -> Unit = {},
+    onAccountClicked: () -> Unit = {}
 ) {
     Box(
         Modifier
@@ -45,7 +47,7 @@ fun BottomNavBar(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { onItemSelected(0) }) {
+            IconButton(onClick = onHomeClicked) {
                 Icon(
                     imageVector = Icons.Default.Home,
                     contentDescription = "Home",
@@ -61,7 +63,7 @@ fun BottomNavBar(
                     .shadow(10.dp, shape = CircleShape)
                     .background(MaterialTheme.colorScheme.secondaryContainer, shape = CircleShape)
             ) {
-                IconButton(onClick = { onItemSelected(1) }) {
+                IconButton(onClick = onAddClicked) {
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Add",
@@ -71,7 +73,7 @@ fun BottomNavBar(
                 }
             }
 
-            IconButton(onClick = { onItemSelected(2) }) {
+            IconButton(onClick = onAccountClicked) {
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = "Account",

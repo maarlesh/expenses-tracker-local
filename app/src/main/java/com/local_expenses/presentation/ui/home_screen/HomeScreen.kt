@@ -69,7 +69,8 @@ import java.time.YearMonth
 fun HomeScreen(
     viewModel: HomeScreenViewModel,
     accounts: List<AccountEntity>,
-    userId : Int
+    userId : Int,
+    onNavigateToCreation: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
@@ -306,7 +307,9 @@ fun HomeScreen(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Bottom
         ) {
-            BottomNavBar()
+            BottomNavBar(
+                onAddClicked = onNavigateToCreation
+            )
         }
     }
 }

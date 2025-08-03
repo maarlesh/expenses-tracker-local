@@ -25,6 +25,8 @@ import com.local_expenses.presentation.theme.LocalexpensesTheme
 import com.local_expenses.presentation.ui.account_selection.CreateUserScreen
 import com.local_expenses.presentation.ui.account_selection.ProfileSelectionScreen
 import com.local_expenses.presentation.ui.account_selection.ProfileSelectionViewModel
+import com.local_expenses.presentation.ui.creation_screen.CreationScreen
+import com.local_expenses.presentation.ui.creation_screen.CreationScreenViewModel
 import com.local_expenses.presentation.ui.home_screen.HomeScreen
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -67,7 +69,12 @@ class MainActivity : ComponentActivity() {
 
                             val accounts by viewModel.account.collectAsState()
 
-                            HomeScreen(viewModel = hiltViewModel(), accounts = accounts, userId)
+                            HomeScreen(
+                                viewModel = hiltViewModel(),
+                                accounts = accounts,
+                                userId,
+                                onNavigateToCreation = { navController.navigate("create_transaction/$userId") }
+                            )
                         }
 
                         composable(
@@ -76,6 +83,17 @@ class MainActivity : ComponentActivity() {
                             CreateUserScreen(
                                 viewModel = hiltViewModel(),
                                 navController = navController,
+                            )
+                        }
+
+                        composable(
+                            route = "create_transaction/{userId}"
+                        ) { backStackEntry ->
+                            val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: error("No userId")
+                            val viewModel: CreationScreenViewModel = hiltViewModel()
+                            CreationScreen(
+                                viewModel = viewModel,
+                                navController = navController
                             )
                         }
                     }
