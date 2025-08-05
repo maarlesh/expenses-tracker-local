@@ -40,12 +40,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.local_expenses.presentation.theme.AppGradientBrush2
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 import com.local_expenses.presentation.theme.MontserratFontFamily
 
 enum class CreationTab {
-    Income, Expense, Transfer
+    Income, Expense, Transfer, Category
 }
 
 @Composable
@@ -62,13 +63,12 @@ fun CreationScreen(
     ) {
         Column(
             Modifier
-                .padding(horizontal = 16.dp)
                 .fillMaxSize(),
         ) {
             // Tab Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.Center
             ) {
                 CreationTabItem(
                     label = "Income",
@@ -85,6 +85,11 @@ fun CreationScreen(
                     isSelected = selectedTab == CreationTab.Transfer,
                     onClick = { selectedTab = CreationTab.Transfer }
                 )
+                CreationTabItem(
+                    label = "Category",
+                    isSelected = selectedTab == CreationTab.Category,
+                    onClick = { selectedTab = CreationTab.Category }
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -93,6 +98,7 @@ fun CreationScreen(
                 CreationTab.Income -> IncomeContent(viewModel)
                 CreationTab.Expense -> ExpenseContent(viewModel)
                 CreationTab.Transfer -> TransferContent(viewModel)
+                CreationTab.Category -> TransferContent(viewModel)
             }
         }
     }
@@ -101,24 +107,24 @@ fun CreationScreen(
 @Composable
 fun CreationTabItem(label: String, isSelected: Boolean, onClick: () -> Unit) {
     val backgroundColor = if (isSelected)
-        Color.White.copy(alpha = 0.4f)
+        Color.White.copy(alpha = 0.6f)
     else
         Color.White.copy(alpha = 0.25f)
 
     val borderColor = if (isSelected)
-        MaterialTheme.colorScheme.secondaryContainer
+        MaterialTheme.colorScheme.primary
     else
         Color.White.copy(alpha = 0.12f)
 
     Box(
         modifier = Modifier
-            .background(backgroundColor, RoundedCornerShape(28.dp))
+            .background(backgroundColor,)
             .border(
                 width = 1.dp,
                 brush = Brush.linearGradient(
                     listOf(borderColor, borderColor)
                 ),
-                shape = RoundedCornerShape(28.dp)
+                shape = RectangleShape
             )
             .clickable { onClick() }
             .padding(20.dp)
@@ -161,7 +167,6 @@ fun IncomeContent(
             )
             .padding(16.dp)
     ) {
-        // Account Dropdown
         AccountDropdown(
             accounts = accounts,
             selectedAccount = selectedAccount,
@@ -170,26 +175,17 @@ fun IncomeContent(
 
         Spacer(Modifier.height(12.dp))
 
-        // Amount Input
         OutlinedTextField(
             value = amountInput,
             onValueChange = { amountInput = it.filter { c -> c.isDigit() || c == '.' } }, // allow digits and decimal
             label = { Text("Amount", color = Color.White) },
             modifier = Modifier.fillMaxWidth(),
-//            colors = OutlinedTextFieldDefaults.colors(
-//                focusedBorderColor = Color.Magenta,
-//                unfocusedBorderColor = Color.White.copy(alpha = 0.4f),
-//                containerColor = Color.White.copy(alpha = 0.1f),
-//                textColor = Color.White,
-//                cursorColor = Color.Magenta
-//            ),
             singleLine = true,
             textStyle = TextStyle(fontSize = 16.sp, fontFamily = MontserratFontFamily)
         )
 
         Spacer(Modifier.height(12.dp))
 
-        // Category Dropdown (emoji)
         Text(text = "Category", color = Color.White, style = MaterialTheme.typography.bodyMedium)
         Box {
             OutlinedTextField(
@@ -199,26 +195,25 @@ fun IncomeContent(
                     .fillMaxWidth()
                     .clickable { expandedCategory = true },
                 readOnly = true,
-//                colors = OutlinedTextFieldDefaults.colors(
-//                    focusedBorderColor = Color.Magenta,
-//                    unfocusedBorderColor = Color.White.copy(alpha = 0.4f),
-//                    containerColor = Color.White.copy(alpha = 0.1f),
-//                    textColor = Color.White,
-//                    cursorColor = Color.Magenta
-//                ),
                 singleLine = true,
                 trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = null,
-                        tint = Color.White
-                    )
+                    IconButton(
+                        onClick = {expandedCategory = !expandedCategory}
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
                 }
             )
             DropdownMenu(
                 expanded = expandedCategory,
                 onDismissRequest = { expandedCategory = false },
-                modifier = Modifier.fillMaxWidth()
+                modifier =  Modifier.background(
+                    AppGradientBrush2
+                )
             ) {
                 categories.forEach { category ->
                     DropdownMenuItem(
