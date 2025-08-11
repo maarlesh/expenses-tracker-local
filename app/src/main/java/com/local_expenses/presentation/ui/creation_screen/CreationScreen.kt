@@ -13,11 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -26,11 +23,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -38,9 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.local_expenses.presentation.theme.AppGradientBrush2
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.sp
-import com.local_expenses.presentation.theme.MontserratFontFamily
+
 
 enum class CreationTab {
     Income, Expense, Transfer, Category
@@ -53,6 +48,8 @@ fun CreationScreen(
     userId : Int
 ) {
     var selectedTab by remember { mutableStateOf(CreationTab.Income) }
+    val accounts by viewModel.accounts.collectAsState()
+    val categories by viewModel.categories.collectAsState()
 
     Box(
         modifier = Modifier
@@ -93,7 +90,7 @@ fun CreationScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             when (selectedTab) {
-                CreationTab.Income -> IncomeContent(viewModel)
+                CreationTab.Income -> CreateIncome(viewModel, accounts, categories)
                 CreationTab.Expense -> ExpenseContent(viewModel)
                 CreationTab.Transfer -> TransferContent(viewModel)
                 CreationTab.Category -> CreateCategory(viewModel, userId)
@@ -133,132 +130,6 @@ fun CreationTabItem(label: String, isSelected: Boolean, onClick: () -> Unit) {
             color = Color.White,
             maxLines = 1
         )
-    }
-}
-
-@Composable
-fun IncomeContent(
-    viewModel: CreationScreenViewModel,
-    accounts: List<String> = listOf("Savings", "Cash", "Credit Card"),
-    categories: List<String> = listOf("💰", "🎉", "🏆", "💼"),
-) {
-    var selectedAccount by remember { mutableStateOf(accounts.firstOrNull() ?: "") }
-    var expandedAccount by remember { mutableStateOf(false) }
-
-    var amountInput by remember { mutableStateOf("") }
-    var selectedCategory by remember { mutableStateOf(categories.firstOrNull() ?: "") }
-    var expandedCategory by remember { mutableStateOf(false) }
-
-    var description by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
-            .border(
-                width = 1.dp,
-                brush = Brush.linearGradient(
-                    listOf(Color.White.copy(alpha = 0.4f), Color.White.copy(alpha = 0.1f))
-                ),
-                shape = RoundedCornerShape(16.dp)
-            )
-            .padding(16.dp)
-    ) {
-        AccountDropdown(
-            accounts = accounts,
-            selectedAccount = selectedAccount,
-            onAccountSelected = { selectedAccount = it }
-        )
-
-        Spacer(Modifier.height(12.dp))
-
-        OutlinedTextField(
-            value = amountInput,
-            onValueChange = { amountInput = it.filter { c -> c.isDigit() || c == '.' } }, // allow digits and decimal
-            label = { Text("Amount", color = Color.White) },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            textStyle = TextStyle(fontSize = 16.sp, fontFamily = MontserratFontFamily)
-        )
-
-        Spacer(Modifier.height(12.dp))
-
-        Text(text = "Category", color = Color.White, style = MaterialTheme.typography.bodyMedium)
-        Box {
-            OutlinedTextField(
-                value = selectedCategory,
-                onValueChange = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { expandedCategory = true },
-                readOnly = true,
-                singleLine = true,
-                trailingIcon = {
-                    IconButton(
-                        onClick = {expandedCategory = !expandedCategory}
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = null,
-                            tint = Color.White
-                        )
-                    }
-                }
-            )
-            DropdownMenu(
-                expanded = expandedCategory,
-                onDismissRequest = { expandedCategory = false },
-                modifier =  Modifier.background(
-                    AppGradientBrush2
-                )
-            ) {
-                categories.forEach { category ->
-                    DropdownMenuItem(
-                        text = { Text(category) },
-                        onClick = {
-                            selectedCategory = category
-                            expandedCategory = false
-                        }
-                    )
-                }
-            }
-        }
-
-        Spacer(Modifier.height(12.dp))
-
-        // Description
-        OutlinedTextField(
-            value = description,
-            onValueChange = { description = it },
-            label = { Text("Description", color = Color.White) },
-            modifier = Modifier.fillMaxWidth(),
-//            colors = OutlinedTextFieldDefaults.colors(
-//                focusedBorderColor = Color.Magenta,
-//                unfocusedBorderColor = Color.White.copy(alpha = 0.4f),
-//                containerColor = Color.White.copy(alpha = 0.1f),
-//                textColor = Color.White,
-//                cursorColor = Color.Magenta
-//            ),
-            maxLines = 3,
-            textStyle = TextStyle(fontSize = 16.sp, fontFamily = MontserratFontFamily)
-        )
-
-        Spacer(Modifier.height(24.dp))
-
-        // Add Button
-        Button(
-            onClick = {
-                // Your logic to add income data here
-                // e.g. viewModel.addIncome(selectedAccount, amountInput, selectedCategory, description)
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Magenta)
-        ) {
-            Text(text = "Add", color = Color.White)
-        }
     }
 }
 

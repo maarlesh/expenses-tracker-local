@@ -21,8 +21,8 @@ interface CategoryDao {
     @Delete
     suspend fun deleteCategory(category: CategoryEntity)
 
-    @Query("SELECT * FROM category")
-    fun getAllCategories(): Flow<List<CategoryEntity>>
+    @Query("SELECT * FROM category WHERE userId = :userId")
+    fun getAllCategories(userId : Int): Flow<List<CategoryEntity>>
 
     @Query("SELECT * FROM category WHERE categoryId = :categoryId LIMIT 1")
     suspend fun getCategoryById(categoryId: Int): CategoryEntity?

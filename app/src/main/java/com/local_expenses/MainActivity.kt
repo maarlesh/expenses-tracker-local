@@ -89,14 +89,14 @@ class MainActivity : ComponentActivity() {
                         composable(
                             route = "create_transaction/{userId}"
                         ) { backStackEntry ->
-                            val userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: error("No userId")
                             val viewModel: CreationScreenViewModel = hiltViewModel()
                             CreationScreen(
-                                viewModel = viewModel,
                                 navController = navController,
-                                userId = userId,
+                                viewModel = viewModel,
+                                userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: error("No userId")
                             )
                         }
+
                     }
                 }
             }
