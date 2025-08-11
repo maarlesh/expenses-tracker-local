@@ -93,7 +93,8 @@ class MainActivity : ComponentActivity() {
                             val viewModel: CreationScreenViewModel = hiltViewModel()
                             CreationScreen(
                                 viewModel = viewModel,
-                                navController = navController
+                                navController = navController,
+                                userId = userId,
                             )
                         }
                     }

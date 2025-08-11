@@ -24,7 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,11 +34,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.local_expenses.presentation.theme.AppGradientBrush2
-import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
@@ -52,7 +49,8 @@ enum class CreationTab {
 @Composable
 fun CreationScreen(
     navController: NavController,
-    viewModel: CreationScreenViewModel
+    viewModel: CreationScreenViewModel,
+    userId : Int
 ) {
     var selectedTab by remember { mutableStateOf(CreationTab.Income) }
 
@@ -98,7 +96,7 @@ fun CreationScreen(
                 CreationTab.Income -> IncomeContent(viewModel)
                 CreationTab.Expense -> ExpenseContent(viewModel)
                 CreationTab.Transfer -> TransferContent(viewModel)
-                CreationTab.Category -> TransferContent(viewModel)
+                CreationTab.Category -> CreateCategory(viewModel, userId)
             }
         }
     }
@@ -141,8 +139,8 @@ fun CreationTabItem(label: String, isSelected: Boolean, onClick: () -> Unit) {
 @Composable
 fun IncomeContent(
     viewModel: CreationScreenViewModel,
-    accounts: List<String> = listOf("Savings", "Cash", "Credit Card"), // replace with your accounts list
-    categories: List<String> = listOf("💰", "🎉", "🏆", "💼") // emoji categories
+    accounts: List<String> = listOf("Savings", "Cash", "Credit Card"),
+    categories: List<String> = listOf("💰", "🎉", "🏆", "💼"),
 ) {
     var selectedAccount by remember { mutableStateOf(accounts.firstOrNull() ?: "") }
     var expandedAccount by remember { mutableStateOf(false) }
