@@ -18,8 +18,8 @@ import androidx.room.PrimaryKey
 data class AccountEntity(
     @PrimaryKey(autoGenerate = true) val accountId: Int = 0,
     val accountName: String,
-    val balance: Double,
+    var balance: Double,
     val userId: Int,
     val createdAt: Long = System.currentTimeMillis(),
-    val updatedAt: Long = System.currentTimeMillis(),
+    var updatedAt: Long = System.currentTimeMillis(),
 )

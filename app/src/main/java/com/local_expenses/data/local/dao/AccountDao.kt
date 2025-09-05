@@ -15,7 +15,7 @@ interface AccountDao {
     suspend fun insertAccount(account: AccountEntity)
 
     @Update
-    suspend fun updateAccount(account: AccountEntity)
+    suspend fun updateAccount(account: AccountEntity?)
 
     @Delete
     suspend fun deleteAccount(account: AccountEntity)

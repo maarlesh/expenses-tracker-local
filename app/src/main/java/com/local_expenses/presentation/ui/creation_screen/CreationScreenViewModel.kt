@@ -1,5 +1,6 @@
 package com.local_expenses.presentation.ui.creation_screen
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,12 +9,14 @@ import com.local_expenses.data.local.dao.CategoryDao
 import com.local_expenses.data.local.dao.ExpenseDao
 import com.local_expenses.data.local.dao.IncomeDao
 import com.local_expenses.data.local.entity.CategoryEntity
+import com.local_expenses.data.local.entity.ExpenseEntity
 import com.local_expenses.data.local.entity.IncomeEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlinx.coroutines.flow.stateIn
+import java.sql.Time
 
 
 @HiltViewModel
@@ -55,6 +58,47 @@ class CreationScreenViewModel @Inject constructor(
                 accountId = accountId
             )
             incomeDao.addIncomeAndUpdateBalance(income)
+        }
+    }
+
+    fun addExpense(
+        categoryId: Int,
+        description : String,
+        amount : Double,
+        accountId : Int
+    ){
+        viewModelScope.launch {
+            val expense = ExpenseEntity(
+                categoryId = categoryId,
+                description = description,
+                amount = amount,
+                accountId = accountId
+            )
+            expenseDao.addExpenseAndUpdateBalance(expense)
+        }
+    }
+
+    fun transferAmount(
+        accountIdFrom : Int,
+        accountIdTo : Int,
+        amount : Double,
+    ){
+        viewModelScope.launch {
+            var accountFrom = accountDao.getAccountById(accountIdFrom);
+            var accountTo = accountDao.getAccountById(accountIdTo);
+            if(accountTo?.balance != null && accountFrom?.balance != null){
+                Log.d("Account: Entered here" , amount.toString())
+                accountFrom.balance -= amount;
+                accountTo.balance += amount;
+                accountFrom.updatedAt = System.currentTimeMillis();
+                accountTo.updatedAt = System.currentTimeMillis();
+            }
+            Log.d("Account : ", accountFrom.toString());
+            Log.d("Account To :", accountTo.toString());
+            accountDao.updateAccount(accountFrom);
+            accountDao.updateAccount(accountTo);
+            Log.d("Account : ", accountFrom.toString());
+            Log.d("Account To :", accountTo.toString());
         }
     }
 

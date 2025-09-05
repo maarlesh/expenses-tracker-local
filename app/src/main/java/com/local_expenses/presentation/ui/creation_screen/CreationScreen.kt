@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.local_expenses.presentation.theme.AppGradientBrush2
 import androidx.compose.ui.graphics.RectangleShape
+import com.local_expenses.presentation.ui.common.BottomNavBar
 
 
 enum class CreationTab {
@@ -45,8 +46,9 @@ enum class CreationTab {
 fun CreationScreen(
     navController: NavController,
     viewModel: CreationScreenViewModel,
-    userId : Int
-) {
+    userId : Int,
+    onHomeTapped: () -> Unit,
+    ) {
     var selectedTab by remember { mutableStateOf(CreationTab.Income) }
     val accounts by viewModel.accounts.collectAsState()
     val categories by viewModel.categories.collectAsState()
@@ -75,6 +77,7 @@ fun CreationScreen(
                     isSelected = selectedTab == CreationTab.Expense,
                     onClick = { selectedTab = CreationTab.Expense }
                 )
+                if(accounts.count() > 1)
                 CreationTabItem(
                     label = "Transfer",
                     isSelected = selectedTab == CreationTab.Transfer,
@@ -91,9 +94,18 @@ fun CreationScreen(
 
             when (selectedTab) {
                 CreationTab.Income -> CreateIncome(viewModel, accounts, categories)
-                CreationTab.Expense -> ExpenseContent(viewModel)
-                CreationTab.Transfer -> TransferContent(viewModel)
+                CreationTab.Expense -> CreateExpense(viewModel, accounts, categories)
+                CreationTab.Transfer -> CreateTransfer(viewModel, accounts)
                 CreationTab.Category -> CreateCategory(viewModel, userId)
+            }
+
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Bottom
+            ) {
+                BottomNavBar(
+                    onHomeClicked = onHomeTapped
+                )
             }
         }
     }

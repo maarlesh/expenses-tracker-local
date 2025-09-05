@@ -89,11 +89,13 @@ class MainActivity : ComponentActivity() {
                         composable(
                             route = "create_transaction/{userId}"
                         ) { backStackEntry ->
-                            val viewModel: CreationScreenViewModel = hiltViewModel()
+                            val viewModel: CreationScreenViewModel = hiltViewModel();
+                            val userId = backStackEntry.arguments?.getString("userId")?.toInt();
                             CreationScreen(
                                 navController = navController,
                                 viewModel = viewModel,
-                                userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: error("No userId")
+                                userId = backStackEntry.arguments?.getString("userId")?.toInt() ?: error("No userId"),
+                                onHomeTapped = { navController.navigate("home/$userId") }
                             )
                         }
 
