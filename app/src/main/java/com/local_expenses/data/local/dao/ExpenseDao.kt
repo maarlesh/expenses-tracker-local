@@ -18,6 +18,19 @@ interface ExpenseDao {
     @Query("SELECT * FROM expense")
     suspend fun getAllExpenses(): List<ExpenseEntity>
 
+    @Query("""
+    SELECT * FROM expense
+    WHERE accountId in (:accountIds)
+      AND createdAt >= :monthStartMillis
+      AND createdAt < :monthEndMillis
+""")
+    suspend fun getExpensesInMonth(
+        accountIds: List<Int>,
+        monthStartMillis: Long,
+        monthEndMillis: Long
+    ): List<ExpenseEntity>
+
+
     @Transaction
     suspend fun addExpenseAndUpdateBalance(expense: ExpenseEntity) {
         insertExpense(expense)

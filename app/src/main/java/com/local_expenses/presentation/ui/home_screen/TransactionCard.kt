@@ -30,12 +30,12 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun TransactionCard(
-    isIncome : Boolean,
-    amount : Int,
-    accountName : String,
+    isIncome: Boolean,
+    amount: Double,
+    accountName: String,
     date: String,
     category: String,
-    description : String,
+    description: String,
 ){
     Box(
         modifier = Modifier

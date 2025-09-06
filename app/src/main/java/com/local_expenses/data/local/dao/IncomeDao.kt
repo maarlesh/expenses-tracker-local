@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import com.local_expenses.data.local.entity.ExpenseEntity
 import com.local_expenses.data.local.entity.IncomeEntity
 
 @Dao
@@ -19,6 +20,20 @@ interface IncomeDao {
 
     @Query("SELECT * FROM income")
     suspend fun getAllExpenses(): List<IncomeEntity>
+
+    @Query("""
+    SELECT * FROM income
+    WHERE accountId in (:accountIds)
+      AND createdAt >= :monthStartMillis
+      AND createdAt < :monthEndMillis
+""")
+    suspend fun getIncomesInMonth(
+        accountIds: List<Int>,
+        monthStartMillis: Long,
+        monthEndMillis: Long
+    ): List<IncomeEntity>
+
+
 
     @Query("UPDATE account SET balance = balance + :amount WHERE accountId = :accountId")
     suspend fun increaseAccountBalance(accountId: Int, amount: Double)

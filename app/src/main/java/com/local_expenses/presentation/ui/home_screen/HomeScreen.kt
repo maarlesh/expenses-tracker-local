@@ -1,8 +1,6 @@
 package com.local_expenses.presentation.ui.home_screen
-import android.R
 import android.os.Build
 import android.util.Log
-import android.widget.Space
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.foundation.background
@@ -44,6 +42,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,12 +55,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.local_expenses.data.local.entity.ExpenseEntity
+import com.local_expenses.data.local.entity.IncomeEntity
 import com.local_expenses.presentation.theme.AppGradientBrush2
 import com.local_expenses.presentation.theme.MontserratFontFamily
 import com.local_expenses.presentation.ui.common.BottomNavBar
 import kotlinx.coroutines.launch
 import com.local_expenses.presentation.theme.PrimaryTextColor
+import java.text.SimpleDateFormat
 import java.time.YearMonth
+import java.util.Date
+import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,7 +80,39 @@ fun HomeScreen(
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
-    var selectedDate by remember { mutableStateOf(YearMonth.of(2025, 8)) }
+    var selectedDate by remember { mutableStateOf(YearMonth.now()) }
+
+    LaunchedEffect(selectedDate, accounts) {
+        viewModel.getAllTransactions(accounts, selectedDate.year, selectedDate.monthValue)
+    }
+
+    LaunchedEffect(userId) {
+        viewModel.loadCategoriesForUser(userId)
+    }
+
+    val expenses by viewModel.expenses.collectAsStateWithLifecycle()
+    val incomes by viewModel.incomes.collectAsStateWithLifecycle()
+
+    val accountMap = remember(accounts) { accounts.associateBy { it.accountId } }
+
+    val transactions = remember(expenses, incomes) {
+        (expenses + incomes).sortedByDescending {
+            (it as? ExpenseEntity)?.createdAt ?: (it as IncomeEntity).createdAt
+        }
+    }
+
+
+    val categories by viewModel.categories.collectAsStateWithLifecycle()
+
+
+    Log.d("Transactions : ", transactions.toString());
+
+    fun formatDate(epochMillis: Long): String {
+        val date = Date(epochMillis)
+        val sdf = SimpleDateFormat("dd/MMM", Locale.ENGLISH)
+        return sdf.format(date)
+    }
+
 
     if(showBottomSheet){
         ModalBottomSheet(onDismissRequest = {
@@ -139,168 +176,32 @@ fun HomeScreen(
             Spacer(
                 modifier = Modifier.height(16.dp)
             )
-            LazyColumn (
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(
-                        start = 0.dp,
-                        end = 0.dp,
-                        top = 0.dp,
-                        bottom = 90.dp,
-                    ),
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
-            ){
-                item {
-                    TransactionCard(
-                        isIncome = true,
-                        date = "01/08/2025",
-                        accountName = "KVB",
-                        amount = 1000,
-                        category = "🍴",
-                        description = "Dinner at KFC"
-                    )
-                }
-                item {
-                    TransactionCard(
-                        isIncome = false,
-                        date = "01/08/2025",
-                        accountName = "KVB",
-                        amount = 1000,
-                        category = "🍴",
-                        description = "Dinner at KFC"
-                    )
-                }
-                item {
-                    TransactionCard(
-                        isIncome = false,
-                        date = "01/08/2025",
-                        accountName = "KVB",
-                        amount = 1000,
-                        category = "🍴",
-                        description = "Dinner at KFC"
-                    )
-                }
-                item {
-                    TransactionCard(
-                        isIncome = false,
-                        date = "01/08/2025",
-                        accountName = "KVB",
-                        amount = 1000,
-                        category = "🍴",
-                        description = "Dinner at KFC"
-                    )
-                }
-                item {
-                    TransactionCard(
-                        isIncome = false,
-                        date = "01/08/2025",
-                        accountName = "KVB",
-                        amount = 1000,
-                        category = "🍴",
-                        description = "Dinner at KFC"
-                    )
-                }
-                item {
-                    TransactionCard(
-                        isIncome = false,
-                        date = "01/08/2025",
-                        accountName = "KVB",
-                        amount = 1000,
-                        category = "🍴",
-                        description = "Dinner at KFC"
-                    )
-                }
-                item {
-                    TransactionCard(
-                        isIncome = false,
-                        date = "01/08/2025",
-                        accountName = "KVB",
-                        amount = 1000,
-                        category = "🍴",
-                        description = "Dinner at KFC"
-                    )
-                }
-                item {
-                    TransactionCard(
-                        isIncome = false,
-                        date = "01/08/2025",
-                        accountName = "KVB",
-                        amount = 1000,
-                        category = "🍴",
-                        description = "Dinner at KFC"
-                    )
-                }
-                item {
-                    TransactionCard(
-                        isIncome = false,
-                        date = "01/08/2025",
-                        accountName = "KVB",
-                        amount = 1000,
-                        category = "🍴",
-                        description = "Dinner at KFC"
-                    )
-                }
-                item {
-                    TransactionCard(
-                        isIncome = false,
-                        date = "01/08/2025",
-                        accountName = "KVB",
-                        amount = 1000,
-                        category = "🍴",
-                        description = "Dinner at KFC"
-                    )
-                }
-                item {
-                    TransactionCard(
-                        isIncome = false,
-                        date = "01/08/2025",
-                        accountName = "KVB",
-                        amount = 1000,
-                        category = "🍴",
-                        description = "Dinner at KFC"
-                    )
-                }
-                item {
-                    TransactionCard(
-                        isIncome = false,
-                        date = "01/08/2025",
-                        accountName = "KVB",
-                        amount = 1000,
-                        category = "🍴",
-                        description = "Dinner at KFC"
-                    )
-                }
-                item {
-                    TransactionCard(
-                        isIncome = false,
-                        date = "01/08/2025",
-                        accountName = "KVB",
-                        amount = 1000,
-                        category = "🍴",
-                        description = "Dinner at KFC"
-                    )
-                }
-                item {
-                    TransactionCard(
-                        isIncome = false,
-                        date = "01/08/2025",
-                        accountName = "KVB",
-                        amount = 1000,
-                        category = "🍴",
-                        description = "Dinner at KFC"
-                    )
-                }
-                item {
-                    TransactionCard(
-                        isIncome = false,
-                        date = "01/08/2025",
-                        accountName = "KVB",
-                        amount = 1000,
-                        category = "🍴",
-                        description = "Dinner at KFC"
-                    )
-                }
+            ) {
 
+                items(transactions) { transaction ->
+                    if (transaction is IncomeEntity) {
+                        TransactionCard(
+                            isIncome = true,
+                            date = formatDate(transaction.createdAt),
+                            accountName = accountMap[transaction.accountId]?.accountName ?: "Unknown",
+                            amount = transaction.amount,
+                            category = categories[transaction.categoryId] ?: "",
+                            description = transaction.description
+                        )
+                    } else if (transaction is ExpenseEntity) {
+                        TransactionCard(
+                            isIncome = false,
+                            date = formatDate(transaction.createdAt),
+                            accountName = accountMap[transaction.accountId]?.accountName ?: "Unknown",
+                            amount = transaction.amount,
+                            category = categories[transaction.categoryId] ?: "",
+                            description = transaction.description
+                        )
+                    }
+                }
             }
         }
         Column(
