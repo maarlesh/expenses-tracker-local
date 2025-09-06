@@ -68,7 +68,7 @@ Screenshots:
 ![Profile Creation Screen](docs/profile_creation_screen.png)
 
 
-![Profile Creation Screen](docs/profile_creation_screen.png)
+![Profile Selection Screen](docs/profile_selection.png)
 
 
 ![Home Screen](docs/home_screen_empty.png)
