@@ -1,5 +1,7 @@
 package com.local_expenses.presentation.ui.creation_screen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.DropdownMenu
@@ -39,9 +42,10 @@ import com.local_expenses.presentation.ui.common.BottomNavBar
 
 
 enum class CreationTab {
-    Income, Expense, Transfer, Category
+    Expense, Transfer, Category
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CreationScreen(
     navController: NavController,
@@ -49,9 +53,16 @@ fun CreationScreen(
     userId : Int,
     onHomeTapped: () -> Unit,
     ) {
-    var selectedTab by remember { mutableStateOf(CreationTab.Income) }
+    var selectedTab by remember { mutableStateOf(CreationTab.Expense) }
     val accounts by viewModel.accounts.collectAsState()
     val categories by viewModel.categories.collectAsState()
+
+
+    val tabItems = listOf(CreationTab.Expense, CreationTab.Transfer, CreationTab.Category)
+    val filteredTabs = if (accounts.count() > 1) tabItems else tabItems.filter { it != CreationTab.Transfer }
+
+
+
 
     Box(
         modifier = Modifier
@@ -62,38 +73,27 @@ fun CreationScreen(
             Modifier
                 .fillMaxSize(),
         ) {
+
+            Spacer(Modifier.height(28.dp))
             // Tab Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                CreationTabItem(
-                    label = "Income",
-                    isSelected = selectedTab == CreationTab.Income,
-                    onClick = { selectedTab = CreationTab.Income }
-                )
-                CreationTabItem(
-                    label = "Expense",
-                    isSelected = selectedTab == CreationTab.Expense,
-                    onClick = { selectedTab = CreationTab.Expense }
-                )
-                if(accounts.count() > 1)
-                CreationTabItem(
-                    label = "Transfer",
-                    isSelected = selectedTab == CreationTab.Transfer,
-                    onClick = { selectedTab = CreationTab.Transfer }
-                )
-                CreationTabItem(
-                    label = "Category",
-                    isSelected = selectedTab == CreationTab.Category,
-                    onClick = { selectedTab = CreationTab.Category }
-                )
+                filteredTabs.forEachIndexed { index, tab ->
+                    CreationTabItem(
+                        label = tab.name,
+                        isSelected = selectedTab == tab,
+                        onClick = { selectedTab = tab },
+                        index = index,
+                        totalCount = filteredTabs.size
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             when (selectedTab) {
-                CreationTab.Income -> CreateIncome(viewModel, accounts, categories)
                 CreationTab.Expense -> CreateExpense(viewModel, accounts, categories)
                 CreationTab.Transfer -> CreateTransfer(viewModel, accounts)
                 CreationTab.Category -> CreateCategory(viewModel, userId)
@@ -112,7 +112,13 @@ fun CreationScreen(
 }
 
 @Composable
-fun CreationTabItem(label: String, isSelected: Boolean, onClick: () -> Unit) {
+fun CreationTabItem(
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    index: Int,
+    totalCount: Int
+) {
     val backgroundColor = if (isSelected)
         Color.White.copy(alpha = 0.6f)
     else
@@ -123,27 +129,34 @@ fun CreationTabItem(label: String, isSelected: Boolean, onClick: () -> Unit) {
     else
         Color.White.copy(alpha = 0.12f)
 
+    val shape = when (index) {
+        0 -> RoundedCornerShape(topStart = 28.dp, bottomStart = 28.dp, topEnd = 0.dp, bottomEnd = 0.dp)
+        totalCount -1 -> RoundedCornerShape(topStart = 0.dp, bottomStart = 0.dp, topEnd = 28.dp, bottomEnd = 28.dp)
+        else -> RoundedCornerShape(0.dp)
+    }
+
     Box(
         modifier = Modifier
-            .background(backgroundColor,)
+            .background(backgroundColor, shape)
             .border(
                 width = 1.dp,
                 brush = Brush.linearGradient(
                     listOf(borderColor, borderColor)
                 ),
-                shape = RectangleShape
+                shape = shape
             )
             .clickable { onClick() }
-            .padding(20.dp)
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.titleMedium,
             color = Color.White,
-            maxLines = 1
+            maxLines = 1,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
     }
 }
+
 
 @Composable
 fun ExpenseContent(viewModel: CreationScreenViewModel) {

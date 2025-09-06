@@ -39,6 +39,7 @@ import com.local_expenses.data.local.entity.CategoryEntity
 import com.local_expenses.presentation.theme.AppGradientBrush2
 import com.local_expenses.presentation.theme.MontserratFontFamily
 import kotlinx.coroutines.launch
+import java.time.ZoneId
 
 @Composable
 fun CreateIncome(
@@ -186,7 +187,8 @@ fun CreateIncome(
                         accountId = selectedAccount!!.accountId,
                         amount = amountInput.toDoubleOrNull() ?: 0.0,
                         categoryId = selectedCategory!!.categoryId,
-                        description = description
+                        description = description,
+                        createdAt = 0
                     )
                     selectedAccount = accounts[0];
                     amountInput = "";

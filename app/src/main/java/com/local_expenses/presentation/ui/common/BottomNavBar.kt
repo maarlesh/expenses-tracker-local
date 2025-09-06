@@ -73,14 +73,14 @@ fun BottomNavBar(
                 }
             }
 
-            IconButton(onClick = onAccountClicked) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Account",
-                    tint = Color.White,
-                    modifier = Modifier.size(30.dp)
-                )
-            }
+//            IconButton(onClick = onAccountClicked) {
+//                Icon(
+//                    imageVector = Icons.Default.Person,
+//                    contentDescription = "Account",
+//                    tint = Color.White,
+//                    modifier = Modifier.size(30.dp)
+//                )
+//            }
         }
     }
 }

@@ -17,6 +17,8 @@ import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.DomainVerification
+import androidx.compose.material.icons.filled.DragIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -48,11 +50,14 @@ fun TransactionCard(
                 ),
                 RoundedCornerShape(28.dp)
             )
-            .padding(20.dp),
+            .padding(
+                horizontal = 8.dp,
+                vertical = 20.dp,
+            ),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(14.dp)
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             if(isIncome){
                 Icon(
@@ -105,10 +110,12 @@ fun TransactionCard(
                         text = accountName,
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color.White,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
                     )
-                    Spacer(
-                        modifier = Modifier.width(16.dp)
-                    )
+                }
+                Row {
                     Text(
                         text = "₹ ${amount.toString()}",
                         style = MaterialTheme.typography.bodyLarge,
@@ -118,14 +125,28 @@ fun TransactionCard(
                     )
                 }
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(14.dp)
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.DragIndicator,
+                        contentDescription = "Income",
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp)
+                    )
                     Text(
                         text = category,
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color.White,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
+                    )
+                    if(description != "")
+                    Icon(
+                        imageVector = Icons.Default.DomainVerification,
+                        contentDescription = "Income",
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp)
                     )
 
                     Text(

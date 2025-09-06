@@ -1,12 +1,15 @@
 package com.local_expenses.presentation.ui.creation_screen
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -54,6 +57,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import androidx.compose.material3.Typography
+import androidx.compose.ui.Alignment
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,6 +87,9 @@ fun CreateExpense(
     val dateFormatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy", Locale.ENGLISH)
     val formattedDate = createdAt.format(dateFormatter)
 
+    var isAmountValid by remember { mutableStateOf(false) } // Start with false since amountInput is empty
+
+
     val customColorScheme = lightColorScheme(
         primary = Color(0xFF7B1FA2),
         onPrimary = Color.White,
@@ -105,7 +112,6 @@ fun CreateExpense(
 
     var isIncome by remember { mutableStateOf(true) }
 
-
     if (showDatePicker) {
         val pickerState = rememberDatePickerState(
             initialSelectedDateMillis = createdAt.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
@@ -115,7 +121,6 @@ fun CreateExpense(
             colorScheme = customColorScheme,
             typography = customTypography
         ) {
-
             DatePickerDialog(
                 onDismissRequest = { showDatePicker = false },
                 confirmButton = {
@@ -158,30 +163,55 @@ fun CreateExpense(
             .padding(16.dp)
     ) {
 
-//        Row {
-//            Button(
-//                onClick = {
-//                    isIncome = true
-//                    selectedCategory = categories.firstOrNull()
-//                },
-//                colors = ButtonDefaults.buttonColors(
-//                    containerColor = if (isIncome) Color(0xFFE91E63) else Color.Gray
-//                )
-//            ) {
-//                Text("Income")
-//            }
-//            Button(
-//                onClick = {
-//                    isIncome = false
-//                    selectedCategory = categories.firstOrNull()
-//                },
-//                colors = ButtonDefaults.buttonColors(
-//                    containerColor = if (!isIncome) Color(0xFFE91E63) else Color.Gray
-//                )
-//            ) {
-//                Text("Expense")
-//            }
-//        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Button(
+                modifier = Modifier
+                    .border(
+                        width = 1.dp,
+                        color = if (isIncome) Color(0xFFE91E63) else Color.Gray,
+                        shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp)
+                    ),
+                shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp),
+                onClick = {
+                    isIncome = true
+                    selectedCategory = categories.firstOrNull()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isIncome) Color(0xFFE91E63) else Color.White.copy(alpha = 0.15f)
+                ),
+            ) {
+                Text(
+                    "Income",
+                    color = Color.White
+                )
+            }
+            Button(
+                modifier = Modifier
+                    .border(
+                        width = 1.dp,
+                        color = if (!isIncome) Color(0xFFE91E63) else Color.Gray,
+                        shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp)
+                    ),
+                shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp),
+                onClick = {
+                    isIncome = false
+                    selectedCategory = categories.firstOrNull()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (!isIncome) Color(0xFFE91E63) else Color.White.copy(alpha = 0.15f)
+                ),
+            ) {
+                Text(
+                    "Expense",
+                    color = Color.White
+                )
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
 
         // ACCOUNT DROPDOWN
         Box(
@@ -228,16 +258,29 @@ fun CreateExpense(
         // AMOUNT
         OutlinedTextField(
             value = amountInput,
-            onValueChange = { amountInput = it.filter { c -> c.isDigit() || c == '.' } },
+            onValueChange = { input ->
+                val filtered = input.filter { c -> c.isDigit() || c == '.' }
+                amountInput = filtered
+                isAmountValid = filtered.toDoubleOrNull()?.let { it > 0.0 } ?: false
+            },
             label = { Text("Amount", color = Color.White) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
+            isError = !isAmountValid && amountInput != "",
             textStyle = TextStyle(
                 fontSize = 16.sp,
                 fontFamily = MontserratFontFamily,
                 color = MaterialTheme.colorScheme.primary
             )
         )
+        if (!isAmountValid && amountInput != "") {
+            Text(
+                text = "Please enter a valid amount greater than zero",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 12.dp, top = 4.dp)
+            )
+        }
 
         Spacer(Modifier.height(12.dp))
 
@@ -310,19 +353,35 @@ fun CreateExpense(
 
         Button(
             onClick = {
-                if (selectedAccount != null && selectedCategory != null) {
-                    viewModel.addExpense(
-                        accountId = selectedAccount!!.accountId,
-                        amount = amountInput.toDoubleOrNull() ?: 0.0,
-                        categoryId = selectedCategory!!.categoryId,
-                        description = description,
-                        createdAt = createdAt.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                    )
+                if (selectedAccount != null && selectedCategory != null && isAmountValid && amountInput.isNotBlank()) {
+
+                    Log.d("Is income :", isIncome.toString())
+                    if (!isIncome) {
+                        viewModel.addExpense(
+                            accountId = selectedAccount!!.accountId,
+                            amount = amountInput.toDoubleOrNull() ?: 0.0,
+                            categoryId = selectedCategory!!.categoryId,
+                            description = description,
+                            createdAt = createdAt.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                        )
+                    } else {
+                        viewModel.addIncome(
+                            accountId = selectedAccount!!.accountId,
+                            amount = amountInput.toDoubleOrNull() ?: 0.0,
+                            categoryId = selectedCategory!!.categoryId,
+                            description = description,
+                            createdAt = createdAt.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                        )
+                    }
+
                     selectedAccount = accounts[0]
                     amountInput = ""
                     selectedCategory = categories[0]
                     description = ""
-                    coroutineScope.launch {
+                    if (isIncome) coroutineScope.launch {
+                        snackbarHostState.showSnackbar("Income added successfully")
+                    }
+                    if (!isIncome) coroutineScope.launch {
                         snackbarHostState.showSnackbar("Expense added successfully")
                     }
                 }
@@ -330,6 +389,7 @@ fun CreateExpense(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
+            enabled = isAmountValid && amountInput.isNotBlank(),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Magenta)
         ) {
             Text(text = "Add", color = Color.White)
