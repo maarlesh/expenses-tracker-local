@@ -54,6 +54,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.local_expenses.data.local.entity.ExpenseEntity
@@ -176,8 +177,16 @@ fun HomeScreen(
             Spacer(
                 modifier = Modifier.height(16.dp)
             )
+            if(transactions.isNotEmpty())
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        start = 0.dp,
+                        end = 0.dp,
+                        top = 0.dp,
+                        bottom = 90.dp,
+                    ),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
 
@@ -201,6 +210,18 @@ fun HomeScreen(
                             description = transaction.description
                         )
                     }
+                }
+            }
+
+            if(transactions.isEmpty()){
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        "No Data available",
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }

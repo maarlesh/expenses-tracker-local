@@ -1,11 +1,13 @@
 package com.local_expenses.presentation.ui.creation_screen
 
-import android.app.DatePickerDialog
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,22 +19,27 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,11 +48,15 @@ import com.local_expenses.data.local.entity.CategoryEntity
 import com.local_expenses.presentation.theme.AppGradientBrush2
 import com.local_expenses.presentation.theme.MontserratFontFamily
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Locale
+import androidx.compose.material3.Typography
 
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateExpense(
     viewModel: CreationScreenViewModel,
@@ -62,30 +73,75 @@ fun CreateExpense(
 
     var description by remember { mutableStateOf("") }
 
-    var createdAt by remember { mutableStateOf(System.currentTimeMillis()) }
+    // Use LocalDate for createdAt
+    var createdAt by remember { mutableStateOf(LocalDate.now()) }
+    val coroutineScope = rememberCoroutineScope()
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
+    var showDatePicker by remember { mutableStateOf(false) }
 
-    val context = LocalContext.current
-    val calendar = Calendar.getInstance().apply { timeInMillis = createdAt }
-    val year = calendar.get(Calendar.YEAR)
-    val month = calendar.get(Calendar.MONTH)
-    val day = calendar.get(Calendar.DAY_OF_MONTH)
+    val dateFormatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy", Locale.ENGLISH)
+    val formattedDate = createdAt.format(dateFormatter)
 
-    val datePickerDialog = remember {
-        DatePickerDialog(context, { _, y, m, d ->
-            val cal = Calendar.getInstance()
-            cal.set(Calendar.YEAR, y)
-            cal.set(Calendar.MONTH, m)
-            cal.set(Calendar.DAY_OF_MONTH, d)
-            createdAt = cal.timeInMillis
-        }, year, month, day)
+    val customColorScheme = lightColorScheme(
+        primary = Color(0xFF7B1FA2),
+        onPrimary = Color.White,
+        secondary = Color(0xFF9C27B0),
+        onSecondary = Color.White,
+        surface = Color(0xFFF3E5F5),
+        onSurface = Color.Black,
+        background = Color(0xFFF3E5F5),
+        onBackground = Color.Black
+    )
+
+    val customTypography = Typography().copy(
+        titleLarge = Typography().titleLarge.copy(color = Color.Black, fontFamily = MontserratFontFamily),
+        titleMedium = Typography().titleMedium.copy(color = Color.Black, fontFamily = MontserratFontFamily),
+        titleSmall = Typography().titleSmall.copy(color = Color.Black, fontFamily = MontserratFontFamily),
+        bodyLarge = Typography().bodyLarge.copy(color = Color.Black, fontFamily = MontserratFontFamily),
+        bodyMedium = Typography().bodyMedium.copy(color = Color.Black, fontFamily = MontserratFontFamily),
+        labelLarge = Typography().labelLarge.copy(color = Color.Black, fontFamily = MontserratFontFamily),
+    )
+
+    var isIncome by remember { mutableStateOf(true) }
+
+
+    if (showDatePicker) {
+        val pickerState = rememberDatePickerState(
+            initialSelectedDateMillis = createdAt.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        )
+
+        MaterialTheme(
+            colorScheme = customColorScheme,
+            typography = customTypography
+        ) {
+
+            DatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showDatePicker = false
+                            pickerState.selectedDateMillis?.let { millis ->
+                                createdAt =
+                                    Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault())
+                                        .toLocalDate()
+                            }
+                        }
+                    ) {
+                        Text("OK")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDatePicker = false }) {
+                        Text("Cancel")
+                    }
+                }
+            ) {
+                DatePicker(state = pickerState)
+            }
+        }
     }
-
-    val formattedDate = SimpleDateFormat("dd/MMM/yyyy", Locale.ENGLISH).format(Date(createdAt))
-
-
 
     Column(
         modifier = Modifier
@@ -101,6 +157,32 @@ fun CreateExpense(
             )
             .padding(16.dp)
     ) {
+
+//        Row {
+//            Button(
+//                onClick = {
+//                    isIncome = true
+//                    selectedCategory = categories.firstOrNull()
+//                },
+//                colors = ButtonDefaults.buttonColors(
+//                    containerColor = if (isIncome) Color(0xFFE91E63) else Color.Gray
+//                )
+//            ) {
+//                Text("Income")
+//            }
+//            Button(
+//                onClick = {
+//                    isIncome = false
+//                    selectedCategory = categories.firstOrNull()
+//                },
+//                colors = ButtonDefaults.buttonColors(
+//                    containerColor = if (!isIncome) Color(0xFFE91E63) else Color.Gray
+//                )
+//            ) {
+//                Text("Expense")
+//            }
+//        }
+
         // ACCOUNT DROPDOWN
         Box(
             modifier = Modifier
@@ -150,11 +232,16 @@ fun CreateExpense(
             label = { Text("Amount", color = Color.White) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            textStyle = TextStyle(fontSize = 16.sp, fontFamily = MontserratFontFamily, color = MaterialTheme.colorScheme.primary)
+            textStyle = TextStyle(
+                fontSize = 16.sp,
+                fontFamily = MontserratFontFamily,
+                color = MaterialTheme.colorScheme.primary
+            )
         )
 
         Spacer(Modifier.height(12.dp))
 
+        // CATEGORY DROPDOWN
         Text(text = "Category", color = Color.White, style = MaterialTheme.typography.bodyMedium)
         Box(
             modifier = Modifier
@@ -200,7 +287,7 @@ fun CreateExpense(
             text = "Date: $formattedDate",
             color = Color.White,
             modifier = Modifier
-                .clickable { datePickerDialog.show() }
+                .clickable { showDatePicker = true }
                 .padding(8.dp)
         )
 
@@ -212,7 +299,11 @@ fun CreateExpense(
             label = { Text("Description", color = Color.White) },
             modifier = Modifier.fillMaxWidth(),
             maxLines = 3,
-            textStyle = TextStyle(fontSize = 16.sp, fontFamily = MontserratFontFamily, color = MaterialTheme.colorScheme.primary),
+            textStyle = TextStyle(
+                fontSize = 16.sp,
+                fontFamily = MontserratFontFamily,
+                color = MaterialTheme.colorScheme.primary
+            ),
         )
 
         Spacer(Modifier.height(24.dp))
@@ -225,16 +316,15 @@ fun CreateExpense(
                         amount = amountInput.toDoubleOrNull() ?: 0.0,
                         categoryId = selectedCategory!!.categoryId,
                         description = description,
-                        createdAt = createdAt
+                        createdAt = createdAt.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
                     )
-                    selectedAccount = accounts[0];
-                    amountInput = "";
-                    selectedCategory = categories[0];
-                    description = "";
-                    scope.launch {
+                    selectedAccount = accounts[0]
+                    amountInput = ""
+                    selectedCategory = categories[0]
+                    description = ""
+                    coroutineScope.launch {
                         snackbarHostState.showSnackbar("Expense added successfully")
                     }
-
                 }
             },
             modifier = Modifier
