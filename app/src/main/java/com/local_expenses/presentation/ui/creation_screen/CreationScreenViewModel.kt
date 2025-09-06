@@ -65,14 +65,16 @@ class CreationScreenViewModel @Inject constructor(
         categoryId: Int,
         description : String,
         amount : Double,
-        accountId : Int
+        accountId : Int,
+        createdAt : Long
     ){
         viewModelScope.launch {
             val expense = ExpenseEntity(
                 categoryId = categoryId,
                 description = description,
                 amount = amount,
-                accountId = accountId
+                accountId = accountId,
+                createdAt = createdAt
             )
             expenseDao.addExpenseAndUpdateBalance(expense)
         }

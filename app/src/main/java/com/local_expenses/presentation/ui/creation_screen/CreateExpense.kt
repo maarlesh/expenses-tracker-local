@@ -1,5 +1,6 @@
 package com.local_expenses.presentation.ui.creation_screen
 
+import android.app.DatePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,6 +41,10 @@ import com.local_expenses.data.local.entity.CategoryEntity
 import com.local_expenses.presentation.theme.AppGradientBrush2
 import com.local_expenses.presentation.theme.MontserratFontFamily
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun CreateExpense(
@@ -56,8 +62,30 @@ fun CreateExpense(
 
     var description by remember { mutableStateOf("") }
 
+    var createdAt by remember { mutableStateOf(System.currentTimeMillis()) }
+
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance().apply { timeInMillis = createdAt }
+    val year = calendar.get(Calendar.YEAR)
+    val month = calendar.get(Calendar.MONTH)
+    val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+    val datePickerDialog = remember {
+        DatePickerDialog(context, { _, y, m, d ->
+            val cal = Calendar.getInstance()
+            cal.set(Calendar.YEAR, y)
+            cal.set(Calendar.MONTH, m)
+            cal.set(Calendar.DAY_OF_MONTH, d)
+            createdAt = cal.timeInMillis
+        }, year, month, day)
+    }
+
+    val formattedDate = SimpleDateFormat("dd/MMM/yyyy", Locale.ENGLISH).format(Date(createdAt))
+
+
 
     Column(
         modifier = Modifier
@@ -168,6 +196,16 @@ fun CreateExpense(
 
         Spacer(Modifier.height(12.dp))
 
+        Text(
+            text = "Date: $formattedDate",
+            color = Color.White,
+            modifier = Modifier
+                .clickable { datePickerDialog.show() }
+                .padding(8.dp)
+        )
+
+        Spacer(Modifier.height(12.dp))
+
         OutlinedTextField(
             value = description,
             onValueChange = { description = it },
@@ -186,7 +224,8 @@ fun CreateExpense(
                         accountId = selectedAccount!!.accountId,
                         amount = amountInput.toDoubleOrNull() ?: 0.0,
                         categoryId = selectedCategory!!.categoryId,
-                        description = description
+                        description = description,
+                        createdAt = createdAt
                     )
                     selectedAccount = accounts[0];
                     amountInput = "";
