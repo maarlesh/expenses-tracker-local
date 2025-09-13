@@ -102,6 +102,24 @@ fun HomeScreen(
         }
     }
 
+    val groupedByDay = remember(expenses, incomes) {
+        (expenses + incomes)
+            .sortedByDescending {
+                (it as? ExpenseEntity)?.createdAt ?: (it as IncomeEntity).createdAt
+            }
+            .groupBy {
+                val millis = (it as? ExpenseEntity)?.createdAt ?: (it as IncomeEntity).createdAt
+                SimpleDateFormat("dd/MMM/yyyy", Locale.ENGLISH).format(Date(millis))
+            }
+    }
+
+    val dailyTotals = remember(groupedByDay) {
+        groupedByDay.mapValues { (_, transactions) ->
+            val totalIncome = transactions.filterIsInstance<IncomeEntity>().sumOf { it.amount }
+            val totalExpense = transactions.filterIsInstance<ExpenseEntity>().sumOf { it.amount }
+            Pair(totalIncome, totalExpense)
+        }
+    }
 
     val categories by viewModel.categories.collectAsStateWithLifecycle()
 
@@ -175,7 +193,7 @@ fun HomeScreen(
                 )
             }
             Spacer(
-                modifier = Modifier.height(16.dp)
+                modifier = Modifier.height(8.dp)
             )
             if(transactions.isNotEmpty())
             LazyColumn(
@@ -187,27 +205,52 @@ fun HomeScreen(
                         top = 0.dp,
                         bottom = 90.dp,
                     ),
-                verticalArrangement = Arrangement.spacedBy(14.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+                groupedByDay.forEach { (date, dailyTransactions) ->
+                    val (totalIncome, totalExpense) = dailyTotals[date] ?: Pair(0.0, 0.0)
+                    item {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = date,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                            Text(
+                                text =  "-   ₹$totalExpense",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = Color.Red,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                            Text(
+                                text =  "+   ₹$totalIncome",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = Color.Green,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        }
+                    }
 
-                items(transactions) { transaction ->
-                    if (transaction is IncomeEntity) {
+                    items(dailyTransactions) { transaction ->
+                        val amount = when (transaction) {
+                            is IncomeEntity -> transaction.amount
+                            is ExpenseEntity -> transaction.amount
+                            else -> 0.0
+                        }
+
                         TransactionCard(
-                            isIncome = true,
-                            date = formatDate(transaction.createdAt),
-                            accountName = accountMap[transaction.accountId]?.accountName ?: "Unknown",
-                            amount = transaction.amount,
-                            category = categories[transaction.categoryId] ?: "",
-                            description = transaction.description
-                        )
-                    } else if (transaction is ExpenseEntity) {
-                        TransactionCard(
-                            isIncome = false,
-                            date = formatDate(transaction.createdAt),
-                            accountName = accountMap[transaction.accountId]?.accountName ?: "Unknown",
-                            amount = transaction.amount,
-                            category = categories[transaction.categoryId] ?: "",
-                            description = transaction.description
+                            isIncome = transaction is IncomeEntity,
+                            date = formatDate(
+                                (transaction as? ExpenseEntity)?.createdAt ?: (transaction as IncomeEntity).createdAt
+                            ),
+                            accountName = accountMap[  (transaction as? ExpenseEntity)?.accountId ?: (transaction as IncomeEntity).accountId]?.accountName ?: "Unknown",
+                            amount = amount,
+                            category = categories[(transaction as? ExpenseEntity)?.categoryId ?: (transaction as IncomeEntity).categoryId] ?: "",
+                            description = (transaction as? ExpenseEntity)?.description ?: (transaction as IncomeEntity).description
                         )
                     }
                 }
@@ -246,10 +289,10 @@ fun AccountCarousel(
 ) {
     Log.d("Accounts for the user", accounts.toString())
     LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(18.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 24.dp)
+            .padding(vertical = 12.dp)
     ) {
         items(accounts) { account ->
             AccountCard(account = account)
@@ -257,7 +300,7 @@ fun AccountCarousel(
         item {
             Box(
                 modifier = Modifier
-                    .height(112.dp)
+                    .height(100.dp)
                     .background(Color.White.copy(alpha = 0.25f), RoundedCornerShape(28.dp))
                     .border(
                         1.dp,

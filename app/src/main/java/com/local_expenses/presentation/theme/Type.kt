@@ -23,21 +23,21 @@ val Typography = Typography(
     titleLarge = TextStyle(
         fontFamily = MontserratFontFamily,
         fontWeight = FontWeight.Bold,
-        fontSize = 28.sp,
+        fontSize = 20.sp,
     ),
     titleMedium = TextStyle(
         fontFamily = MontserratFontFamily,
         fontWeight = FontWeight.Bold,
-        fontSize = 24.sp,
+        fontSize = 16.sp,
     ),
     titleSmall = TextStyle(
         fontFamily = MontserratFontFamily,
         fontWeight = FontWeight.Bold,
-        fontSize = 20.sp,
+        fontSize = 14.sp,
     ),
 
     bodyLarge = TextStyle(
-        fontSize = 18.sp,
+        fontSize = 14.sp,
         fontWeight = FontWeight.Normal,
         fontFamily = MontserratFontFamily,
         color = Color.White,
@@ -45,12 +45,12 @@ val Typography = Typography(
     bodyMedium = TextStyle(
         fontFamily = MontserratFontFamily,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp
+        fontSize = 12.sp
     ),
     bodySmall = TextStyle(
         fontFamily = MontserratFontFamily,
         fontWeight = FontWeight.Normal,
-        fontSize = 14.sp
+        fontSize = 10.sp
     ),
     labelLarge = TextStyle(
         fontFamily = MontserratFontFamily,

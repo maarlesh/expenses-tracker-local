@@ -62,6 +62,8 @@ A mobile application for tracking personal expenses and incomes, built with Kotl
 
 Screenshots:
 
+![Home Screen](docs/home_screen.png)
+
 ![Onboarding Screen](docs/onboarding_screen.png)
 
 

@@ -27,8 +27,8 @@ import com.local_expenses.presentation.theme.MontserratFontFamily
 fun AccountCard(account: AccountEntity) {
     Box(
         modifier = Modifier
-            .width(220.dp)
-            .height(112.dp)
+            .width(150.dp)
+            .height(100.dp)
             .background(Color.White.copy(alpha = 0.25f), RoundedCornerShape(28.dp))
             .border(
                 1.dp,

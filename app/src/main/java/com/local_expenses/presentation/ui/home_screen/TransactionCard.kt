@@ -42,17 +42,17 @@ fun TransactionCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White.copy(alpha = 0.25f), RoundedCornerShape(28.dp))
+            .background(Color.White.copy(alpha = 0.25f), RoundedCornerShape(5.dp))
             .border(
                 1.dp,
                 Brush.linearGradient(
                     listOf(Color.White.copy(alpha = 0.55f), Color.White.copy(alpha = 0.12f))
                 ),
-                RoundedCornerShape(28.dp)
+                RoundedCornerShape(5.dp)
             )
             .padding(
-                horizontal = 8.dp,
-                vertical = 20.dp,
+                horizontal = 2.dp,
+                vertical = 4.dp,
             ),
     ) {
         Row(
@@ -64,75 +64,79 @@ fun TransactionCard(
                     imageVector = Icons.Default.ArrowDropUp,
                     contentDescription = "Income",
                     tint = Color.Green,
-                    modifier = Modifier.size(50.dp)
+                    modifier = Modifier.size(40.dp)
                 )
             }else{
                 Icon(
                     imageVector = Icons.Default.ArrowDropDown,
                     contentDescription = "Expense",
                     tint = Color.Red,
-                    modifier = Modifier.size(50.dp)
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+            Box(
+                Modifier.width(100.dp)
+            ) {
+                Text(
+                    text = "${if (isIncome) "+" else "-"}  ₹ ${amount.toString()}",
+//                    text = "${if (isIncome) "+" else "-"}  ₹ ${2000000000}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = if (isIncome) Color.Green else Color.Red,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
             Column(
-                verticalArrangement = Arrangement.spacedBy(18.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ){
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.CalendarMonth,
-                        contentDescription = "Date",
-                        tint = Color.White,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(
-                        modifier = Modifier.width(8.dp)
-                    )
-                    Text(
-                        text = date,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Color.White,
-                    )
-                    Spacer(
-                        modifier = Modifier.width(16.dp)
-                    )
+//                    Icon(
+//                        imageVector = Icons.Default.CalendarMonth,
+//                        contentDescription = "Date",
+//                        tint = Color.White,
+//                        modifier = Modifier.size(18.dp)
+//                    )
+//                    Spacer(
+//                        modifier = Modifier.width(8.dp)
+//                    )
+//                    Text(
+//                        text = date,
+//                        style = MaterialTheme.typography.bodyLarge,
+//                        color = Color.White,
+//                    )
+//                    Spacer(
+//                        modifier = Modifier.width(16.dp)
+//                    )
+
                     Icon(
                         imageVector = Icons.Default.AccountBalanceWallet,
-                        contentDescription = "Date",
+                        contentDescription = "Account",
                         tint = Color.White,
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(
-                        modifier = Modifier.width(8.dp)
+                        modifier = Modifier.width(4.dp)
                     )
-                    Text(
-                        text = accountName,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Color.White,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-                Row {
-                    Text(
-                        text = "₹ ${amount.toString()}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Color.White,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(14.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                    Box (
+                        Modifier.width(100.dp)
+                    ){
+                        Text(
+                            text = accountName,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.White,
+                            //                        overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                     Icon(
                         imageVector = Icons.Default.DragIndicator,
                         contentDescription = "Income",
                         tint = Color.White,
                         modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(
+                        modifier = Modifier.width(4.dp)
                     )
                     Text(
                         text = category,
@@ -141,7 +145,12 @@ fun TransactionCard(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    if(description != "")
+                }
+                if(description != "")
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Icon(
                         imageVector = Icons.Default.DomainVerification,
                         contentDescription = "Income",
@@ -152,7 +161,7 @@ fun TransactionCard(
                     Text(
                         text = description,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = Color.White,
+                        color = Color(0xFF969696),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
