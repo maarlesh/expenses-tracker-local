@@ -40,7 +40,7 @@ import com.local_expenses.presentation.theme.MontserratFontFamily
 import kotlinx.coroutines.launch
 
 @Composable
-fun CreateTransfer(viewModel: CreationScreenViewModel, accounts : List<AccountEntity>,){
+fun CreateTransfer(viewModel: CreationScreenViewModel, accounts : List<AccountEntity>, onCreated : () -> Unit){
     var selectedAccountFrom by remember { mutableStateOf(accounts.firstOrNull()) }
     var selectedAccountTo by remember {mutableStateOf(accounts[1])}
 
@@ -187,7 +187,7 @@ fun CreateTransfer(viewModel: CreationScreenViewModel, accounts : List<AccountEn
                     scope.launch {
                         snackbarHostState.showSnackbar("Expense added successfully")
                     }
-
+                    onCreated()
                 }
             },
             modifier = Modifier

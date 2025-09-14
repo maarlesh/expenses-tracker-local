@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.local_expenses.data.local.entity.ExpenseEntity
 import com.local_expenses.data.local.entity.IncomeEntity
+import com.local_expenses.data.local.entity.TransferEntity
 import com.local_expenses.presentation.theme.AppGradientBrush2
 import com.local_expenses.presentation.theme.MontserratFontFamily
 import com.local_expenses.presentation.ui.common.BottomNavBar
@@ -93,22 +94,41 @@ fun HomeScreen(
 
     val expenses by viewModel.expenses.collectAsStateWithLifecycle()
     val incomes by viewModel.incomes.collectAsStateWithLifecycle()
+    val transfers by viewModel.transfers.collectAsStateWithLifecycle()
+
 
     val accountMap = remember(accounts) { accounts.associateBy { it.accountId } }
 
-    val transactions = remember(expenses, incomes) {
-        (expenses + incomes).sortedByDescending {
-            (it as? ExpenseEntity)?.createdAt ?: (it as IncomeEntity).createdAt
-        }
+    val transactions = remember(expenses, incomes, transfers) {
+        (expenses as List<Any> + incomes as List<Any> + transfers as List<Any>)
+            .sortedByDescending {
+                when(it) {
+                    is ExpenseEntity -> it.createdAt
+                    is IncomeEntity -> it.createdAt
+                    is TransferEntity -> it.createdAt
+                    else -> 0L
+                }
+            }
     }
 
-    val groupedByDay = remember(expenses, incomes) {
-        (expenses + incomes)
+
+    val groupedByDay = remember(expenses, incomes, transfers) {
+        (expenses as List<Any> + incomes as List<Any> + transfers as List<Any>)
             .sortedByDescending {
-                (it as? ExpenseEntity)?.createdAt ?: (it as IncomeEntity).createdAt
+                when(it) {
+                    is ExpenseEntity -> it.createdAt
+                    is IncomeEntity -> it.createdAt
+                    is TransferEntity -> it.createdAt
+                    else -> 0L
+                }
             }
             .groupBy {
-                val millis = (it as? ExpenseEntity)?.createdAt ?: (it as IncomeEntity).createdAt
+                val millis = when(it) {
+                    is ExpenseEntity -> it.createdAt
+                    is IncomeEntity -> it.createdAt
+                    is TransferEntity -> it.createdAt
+                    else -> 0L
+                }
                 SimpleDateFormat("dd/MMM/yyyy", Locale.ENGLISH).format(Date(millis))
             }
     }
@@ -236,23 +256,33 @@ fun HomeScreen(
                     }
 
                     items(dailyTransactions) { transaction ->
-                        val amount = when (transaction) {
-                            is IncomeEntity -> transaction.amount
-                            is ExpenseEntity -> transaction.amount
-                            else -> 0.0
+                        when (transaction) {
+                            is ExpenseEntity -> TransactionCard(
+                                isIncome = false,
+                                date = formatDate(transaction.createdAt),
+                                accountName = accountMap[transaction.accountId]?.accountName ?: "Unknown",
+                                amount = transaction.amount,
+                                category = categories[transaction.categoryId] ?: "",
+                                description = transaction.description
+                            )
+                            is IncomeEntity -> TransactionCard(
+                                isIncome = true,
+                                date = formatDate(transaction.createdAt),
+                                accountName = accountMap[transaction.accountId]?.accountName ?: "Unknown",
+                                amount = transaction.amount,
+                                category = categories[transaction.categoryId] ?: "",
+                                description = transaction.description
+                            )
+                            is TransferEntity -> TransferCard(
+                                date = formatDate(transaction.createdAt),
+                                fromAccountName = accountMap[transaction.fromAccountId]?.accountName ?: "Unknown",
+                                toAccountName = accountMap[transaction.toAccountId]?.accountName ?: "Unknown",
+                                amount = transaction.amount,
+                                description = transaction.description
+                            )
                         }
-
-                        TransactionCard(
-                            isIncome = transaction is IncomeEntity,
-                            date = formatDate(
-                                (transaction as? ExpenseEntity)?.createdAt ?: (transaction as IncomeEntity).createdAt
-                            ),
-                            accountName = accountMap[  (transaction as? ExpenseEntity)?.accountId ?: (transaction as IncomeEntity).accountId]?.accountName ?: "Unknown",
-                            amount = amount,
-                            category = categories[(transaction as? ExpenseEntity)?.categoryId ?: (transaction as IncomeEntity).categoryId] ?: "",
-                            description = (transaction as? ExpenseEntity)?.description ?: (transaction as IncomeEntity).description
-                        )
                     }
+
                 }
             }
 

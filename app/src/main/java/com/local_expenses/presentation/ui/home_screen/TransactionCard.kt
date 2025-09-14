@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.DomainVerification
 import androidx.compose.material.icons.filled.DragIndicator
+import androidx.compose.material.icons.filled.MoveUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -167,6 +168,107 @@ fun TransactionCard(
                     )
                 }
 
+            }
+        }
+    }
+}
+
+@Composable
+fun TransferCard(
+    date: String,
+    fromAccountName: String,
+    toAccountName: String,
+    amount: Double,
+    description: String?,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White.copy(alpha = 0.25f), RoundedCornerShape(5.dp))
+            .border(
+                1.dp,
+                Brush.linearGradient(
+                    listOf(Color.White.copy(alpha = 0.55f), Color.White.copy(alpha = 0.12f))
+                ),
+                RoundedCornerShape(5.dp)
+            )
+            .padding(horizontal = 10.dp, vertical = 4.dp),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.MoveUp,
+                contentDescription = "Transfer",
+                tint = Color.Cyan,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(Modifier.width(10.dp))
+            Box(Modifier.width(100.dp)) {
+                Text(
+                    text = "₹ ${amount.toString()}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Cyan,
+                    maxLines = 1,
+                )
+            }
+
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "From: ",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.White,
+                    )
+                    Box(
+                        modifier = Modifier.width(75.dp)
+                    ) {
+                        Text(
+                            text = fromAccountName,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.White,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    Text(
+                        text = "To: ",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.White,
+                    )
+                    Box (
+                        modifier = Modifier.width(75.dp)
+                    ){
+                        Text(
+                            text = toAccountName,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.White,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+                if (!description.isNullOrBlank()) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.DomainVerification,
+                            contentDescription = "Description",
+                            tint = Color.White,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Text(
+                            text = description,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color(0xFF969696),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
             }
         }
     }

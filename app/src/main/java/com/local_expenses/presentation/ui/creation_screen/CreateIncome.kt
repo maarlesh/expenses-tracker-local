@@ -46,6 +46,7 @@ fun CreateIncome(
     viewModel: CreationScreenViewModel,
     accounts: List<AccountEntity>,
     categories: List<CategoryEntity>,
+    onCreated : () -> Unit,
 ) {
     var selectedAccount by remember { mutableStateOf(accounts.firstOrNull()) }
     var expandedAccount by remember { mutableStateOf(false) }
@@ -197,7 +198,7 @@ fun CreateIncome(
                     scope.launch {
                         snackbarHostState.showSnackbar("Income added successfully")
                     }
-
+                    onCreated()
                 }
             },
             modifier = Modifier

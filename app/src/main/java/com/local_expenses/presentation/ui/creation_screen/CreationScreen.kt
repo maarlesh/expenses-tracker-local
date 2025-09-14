@@ -37,7 +37,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.local_expenses.presentation.theme.AppGradientBrush2
-import androidx.compose.ui.graphics.RectangleShape
 import com.local_expenses.presentation.ui.common.BottomNavBar
 
 
@@ -94,9 +93,9 @@ fun CreationScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             when (selectedTab) {
-                CreationTab.Expense -> CreateExpense(viewModel, accounts, categories)
-                CreationTab.Transfer -> CreateTransfer(viewModel, accounts)
-                CreationTab.Category -> CreateCategory(viewModel, userId)
+                CreationTab.Expense -> CreateExpense(viewModel,accounts, categories, onCreated(navController, userId))
+                CreationTab.Transfer -> CreateTransfer(viewModel, accounts, onCreated(navController, userId))
+                CreationTab.Category -> CreateCategory(viewModel, userId, onCreated(navController, userId))
             }
 
             Column(
@@ -108,6 +107,12 @@ fun CreationScreen(
                 )
             }
         }
+    }
+}
+
+fun onCreated(navController: NavController, userId: Int): () -> Unit = {
+    navController.navigate("home/$userId") {
+        popUpTo("create_transaction/$userId") { inclusive = true }
     }
 }
 

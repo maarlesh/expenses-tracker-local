@@ -9,7 +9,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -57,7 +56,6 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import androidx.compose.material3.Typography
-import androidx.compose.ui.Alignment
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,6 +64,7 @@ fun CreateExpense(
     viewModel: CreationScreenViewModel,
     accounts: List<AccountEntity>,
     categories: List<CategoryEntity>,
+    onCreated: () -> Unit,
 ) {
     var selectedAccount by remember { mutableStateOf(accounts.firstOrNull()) }
     var expandedAccount by remember { mutableStateOf(false) }
@@ -384,6 +383,7 @@ fun CreateExpense(
                     if (!isIncome) coroutineScope.launch {
                         snackbarHostState.showSnackbar("Expense added successfully")
                     }
+                    onCreated()
                 }
             },
             modifier = Modifier

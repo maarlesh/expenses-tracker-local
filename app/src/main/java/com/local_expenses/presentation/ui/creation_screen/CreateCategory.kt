@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 fun CreateCategory(
     viewModel: CreationScreenViewModel,
     userId: Int,
+    onCreated : () -> Unit
 ) {
     var amountInput by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -72,6 +73,7 @@ fun CreateCategory(
                     scope.launch {
                         snackbarHostState.showSnackbar("Category added successfully")
                     }
+                    onCreated()
                 },
                 enabled = amountInput != "",
                 text = "Create",

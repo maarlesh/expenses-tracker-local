@@ -7,9 +7,11 @@ import com.local_expenses.data.local.dao.AccountDao
 import com.local_expenses.data.local.dao.CategoryDao
 import com.local_expenses.data.local.dao.ExpenseDao
 import com.local_expenses.data.local.dao.IncomeDao
+import com.local_expenses.data.local.dao.TransferDao
 import com.local_expenses.data.local.entity.AccountEntity
 import com.local_expenses.data.local.entity.ExpenseEntity
 import com.local_expenses.data.local.entity.IncomeEntity
+import com.local_expenses.data.local.entity.TransferEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +27,7 @@ class HomeScreenViewModel @Inject constructor(
     private val expenseDao : ExpenseDao,
     private val incomeDao : IncomeDao,
     private val categoryDao : CategoryDao,
+    private val transferDao: TransferDao,
 ) : ViewModel() {
 
     fun createAccount(account: AccountEntity){
@@ -40,6 +43,9 @@ class HomeScreenViewModel @Inject constructor(
 
     private val _incomes = MutableStateFlow<List<IncomeEntity>>(emptyList())
     val incomes: StateFlow<List<IncomeEntity>> = _incomes.asStateFlow()
+
+    private val _transfers = MutableStateFlow<List<TransferEntity>>(emptyList())
+    val transfers: StateFlow<List<TransferEntity>> = _transfers.asStateFlow()
 
     private val _categories = MutableStateFlow<Map<Int, String>>(emptyMap())
     val categories: StateFlow<Map<Int, String>> = _categories.asStateFlow()
@@ -69,13 +75,14 @@ class HomeScreenViewModel @Inject constructor(
         viewModelScope.launch {
             val expenseList = expenseDao.getExpensesInMonth(accountIds, monthStartMillis, monthEndMillis)
             val incomeList = incomeDao.getIncomesInMonth(accountIds, monthStartMillis, monthEndMillis)
-
+            val transferList = transferDao.getTransfersInMonth(monthStartMillis, monthEndMillis)
 
             _expenses.value = expenseList
             _incomes.value = incomeList
-
+            _transfers.value = transferList
             Log.d("Transaction : expenses", _expenses.toString())
             Log.d("Transaction : incomes", _incomes.toString())
+            Log.d("Transaction : transfer", _transfers.toString())
         }
     }
 
