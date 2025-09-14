@@ -8,9 +8,11 @@ import com.local_expenses.data.local.dao.AccountDao
 import com.local_expenses.data.local.dao.CategoryDao
 import com.local_expenses.data.local.dao.ExpenseDao
 import com.local_expenses.data.local.dao.IncomeDao
+import com.local_expenses.data.local.dao.TransferDao
 import com.local_expenses.data.local.entity.CategoryEntity
 import com.local_expenses.data.local.entity.ExpenseEntity
 import com.local_expenses.data.local.entity.IncomeEntity
+import com.local_expenses.data.local.entity.TransferEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
@@ -25,6 +27,7 @@ class CreationScreenViewModel @Inject constructor(
     private val incomeDao: IncomeDao,
     private val expenseDao: ExpenseDao,
     private val categoryDao: CategoryDao,
+    private val transferDao: TransferDao,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -101,6 +104,14 @@ class CreationScreenViewModel @Inject constructor(
             Log.d("Account To :", accountTo.toString());
             accountDao.updateAccount(accountFrom);
             accountDao.updateAccount(accountTo);
+            transferDao.insertTransfer(
+                TransferEntity(
+                    fromAccountId = accountIdFrom,
+                    toAccountId = accountIdTo,
+                    description = "something",
+                    amount = amount,
+                )
+            )
             Log.d("Account : ", accountFrom.toString());
             Log.d("Account To :", accountTo.toString());
         }

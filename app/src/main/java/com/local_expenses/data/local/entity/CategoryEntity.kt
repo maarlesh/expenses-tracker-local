@@ -20,6 +20,7 @@ data class CategoryEntity(
     val name: String,
     val icon: String,
     val userId: Int,
+    val type: String = "expense",
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
 )

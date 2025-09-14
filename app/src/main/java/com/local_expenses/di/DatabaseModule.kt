@@ -42,4 +42,7 @@ object DatabaseModule {
 
     @Provides
     fun provideCategoryDao(db: AppDatabase): CategoryDao = db.categoryDao()
+
+    @Provides
+    fun provideTransferDao(db: AppDatabase): TransferDao = db.transferDao()
 }
